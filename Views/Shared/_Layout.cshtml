@@ -1,0 +1,155 @@
+﻿@using PUCITSocialClub.Models
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/navbar-color.css" rel="stylesheet" />
+    <script src="~/Script/bootstrap.min.js" ></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</head>
+<body>
+    <nav class="nav navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">PUCIT Social Club</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="/Home/Contact">Contact Us</a></li>
+            </ul>
+            @{
+                SocialClubDbEntities1 de = new SocialClubDbEntities1 ();
+                int msgs = 0;
+            }
+
+            @if (Session["login"] != null)
+            {
+                <form class="form-inline navbar-form navbar-left pull-right" action="/Home/LogOut" method="post">
+                    <div class="form-group">
+                        <button type="submit" style="text-decoration-color:white" class="btn btn-warning">Log Out</button>
+                    </div>
+                </form>
+            }
+            <form class="form-inline navbar-form navbar-left pull-right" action="/Home/Login" method="post" >
+                @if (Session["login"] != null)
+                {
+                   
+                    Student u = (Student)Session["userlog"];
+                
+                    <div class="form-group">
+                        @if (Session["isAdmin"] != null)
+                        {
+                            <i>
+                                <a href="/Admin/AdminLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                            </i>
+                        }
+                        else
+                        {
+                            <i>
+                                <a href="/Student/UserLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                            </i>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group">
+                        
+                        <strong style="text-decoration-color:white" >Username: </strong>
+                        <input type="text" name="name" required placeholder="Enter Uername" />
+                        <strong style="text-decoration-color:white" > Password:  </strong>
+                        <input type="password" name="passwd" required placeholder="Enter Password" />
+                        <button type="submit" style="text-decoration-color:white" class="btn btn-primary">Login</button>
+                        @{
+                            if (Session["f_login"] != null)
+                            {
+                                    <strong class="alert alert-danger"><span class="glyphicon glyphicon-exclamation-sign"></span>Invalid Username or Password! </strong>
+                            }
+                        }
+
+                    </div>
+                }
+            </form>
+            
+        </div>
+    </nav>
+    <div class="row" style="padding-top:60px">
+        <div class="col-md-3">
+            <div class="list-group" style="min-height:750px; max-width:300px">
+                @if (Session["login"] != null)
+                {
+                    Student u = (Student) Session["userlog"];
+                    
+                    <label class="list-group-item active">Activities</label>
+                    <a class="list-group-item" href="/Student/SearchStudent">Search for a Student</a>
+                    <a class="list-group-item" href="/Group/CreateGroup">Create a Group</a>
+                    <a class="list-group-item" href="/Group/ViewGroups">View Groups</a>
+                    <a class="list-group-item" href="/Group/ShowGroups">Visit Your Groups</a>
+                    <a class="list-group-item" href="/Group/JoinGroup">Join a Group</a>
+                    <a class="list-group-item" href="/Student/EditProfile">Edit your Profile</a>
+                    if (Session["isAdmin"] != null)
+                    {
+                        <a class="list-group-item" href="/Admin/ViewUsers">View Users</a>
+                        {
+                            foreach (AdminMessage adm in de.AdminMessages.Where ( x => x.newmsg.Equals ( "yes" ) ))
+                            {
+                                msgs++;
+                            }
+                         }
+                        if (msgs <= 0)
+                        {
+                            <a class="list-group-item" href="/Admin/ViewMessages">Public Messages</a>
+                        }
+                        else
+                        {
+                            <a class="list-group-item" href="/Admin/ViewMessages"><span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Public Messages(@msgs)</a>
+                        }
+                    }
+
+                    int newmsg = 0;
+                    foreach (Message adm in de.Messages.Where ( x => x.sentto == u.Id && x.newmsg.Equals ( "yes" ) ))
+                    {
+                        newmsg++;
+                    }
+                    
+                    if (newmsg <= 0)
+                    {
+                        <a class="list-group-item" href="/Message/ViewInbox">Inbox</a>
+                    }
+                    else
+                    {
+                        <a class="list-group-item" href="/Message/ViewInbox">
+                            <span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Inbox(@newmsg)
+                        </a>
+                    }
+                }
+                else
+                {
+                    <label class="list-group-item active">Activities</label>
+                    <a class="list-group-item" href="#">Search for a Student</a>
+                    <a class="list-group-item" href="#">Create a Group</a>
+                    <a class="list-group-item" href="#">View Groups</a>
+                    <a class="list-group-item" href="#">Visit Your Groups</a>
+                    <a class="list-group-item" href="#">Join a Group</a>
+                    <a class="list-group-item" href="#">Edit your Profile</a>
+                }
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            @RenderSection("first", required: false)
+            
+        </div>
+
+    </div>
+    
+    <footer class="modal-footer" style="margin-top: 100px; padding-top: 60px; background-color: lightgrey">Created By Afnan Ahmad</footer>
+</body>
+</html>

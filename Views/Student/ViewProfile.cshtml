@@ -1,0 +1,204 @@
+﻿@model PUCITSocialClub.Models.Student
+@using PUCITSocialClub.Models
+
+@{
+    ViewBag.Title = "ViewProfile";
+    Layout = null;
+}
+
+<html>
+
+<head>
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/navbar-color.css" rel="stylesheet" />
+    <script src="~/Script/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</head>
+
+<body>
+    <nav class="nav navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">PUCIT Social Club</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/Contact">Contact Us</a></li>
+            </ul>
+
+            <form class="form-inline navbar-form navbar-left pull-right" action="/Home/LogOut" method="post">
+                @{
+                    Student u = (Student)Session["userlog"];
+                    SocialClubDbEntities1 de = new SocialClubDbEntities1 ();
+                    int msgs = 0;
+                }
+                <div class="form-group">
+                    @if (Session["isAdmin"] != null)
+                    {
+                        <i>
+                            <a href="/Admin/AdminLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                    else
+                    {
+                        <i>
+                            <a href="/Student/UserLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                </div>
+                <div class="form-group">
+                    <button type="submit" style="text-decoration-color:white" class="btn btn-warning">Log Out</button>
+                </div>
+            </form>
+
+        </div>
+    </nav>
+    <div class="row" style="padding-top:60px">
+        <div class="col-md-3">
+            <div class="list-group" style="min-height:750px; max-width:300px">
+                <label class="list-group-item active">Activities</label>
+                <a class="list-group-item" href="/Student/SearchStudent">Search for a Student</a>
+                <a class="list-group-item" href="/Group/CreateGroup">Create a Group</a>
+                <a class="list-group-item" href="/Group/ViewGroups">View Groups</a>
+                <a class="list-group-item" href="/Group/ShowGroups">Visit Your Groups</a>
+                <a class="list-group-item" href="/Group/JoinGroup">Join a Group</a>
+                <a class="list-group-item" href="/Student/EditProfile">Edit your Profile</a>
+                @if (Session["isAdmin"] != null)
+                {
+                    <a class="list-group-item" href="/Admin/ViewUsers">View Users</a>
+                    {
+                        foreach (AdminMessage adm in de.AdminMessages.Where ( x => x.newmsg.Equals ( "yes" ) ))
+                        {
+                            msgs++;
+                        }
+                     }
+                    if (msgs <= 0)
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages">Public Messages</a>
+                    }
+                    else
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages"><span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Public Messages(@msgs)</a>
+                    }
+                }
+                @{
+                    int newmsg = 0;
+                    foreach (Message adm in de.Messages.Where ( x => x.sentto == u.Id && x.newmsg.Equals ( "yes" ) ))
+                    {
+                        newmsg++;
+                    }
+                }
+                @if (newmsg <= 0)
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">Inbox</a>
+                }
+                else
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">
+                        <span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Inbox(@newmsg)
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6 pull-left">
+            <div>
+                <div class="panel panel-success">
+                    <div class="panel panel-heading">
+                        <div class="panel-title">@Model.username </div>
+                    </div>
+                    <div class="panel panel-body">
+                        <form action=""
+                              method="post" class="form-horizontal form-control-static" role="form">
+                            <div class="form-group">
+                                <label for="username" class="col-md-3 control-label">Profile Picture</label>
+                                <div class="col-md-9">
+                                    <img src="~/Files/@Model.img" width="200" height="200" />
+                                </div>
+                            </div>
+                        </form>
+                        <form action=""
+                              method="post" class="form-horizontal form-control-static" role="form">
+                            <div class="form-group">
+                                <label for="username" class="col-md-3 control-label">Username</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.username
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="col-md-3 control-label">Password</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.password
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fullname" class="col-md-3 control-label">Full Name</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.fullname
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="col-md-3 control-label">Email</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.email
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address" class="col-md-3 control-label">Address</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.address
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contact" class="col-md-3 control-label">Contact</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.contact
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="rollnumber" class="col-md-3 control-label">Roll Number</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.rollnumber
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="currsemester" class="col-md-3 control-label">Current Semester</label>
+                                <div class="col-md-9">
+                                    <p class="form-control">
+                                        @Model.currsemester
+                                    </p>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <footer class="modal-footer" style="margin-top: 100px; padding-top: 60px; background-color: lightgrey">Created By Afnan Ahmad</footer>
+</body>
+
+</html>

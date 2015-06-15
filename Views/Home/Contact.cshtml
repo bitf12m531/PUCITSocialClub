@@ -1,0 +1,149 @@
+﻿@model PUCITSocialClub.Models.AdminMessage
+@using PUCITSocialClub.Models
+
+@{
+    ViewBag.Title = "Contact";
+    Layout = null;
+}
+
+
+<html>
+    <head>
+        <title>@ViewBag.Title</title>
+        <link href="~/Content/bootstrap.css" rel="stylesheet" />
+        <link href="~/Content/navbar-color.css" rel="stylesheet" />
+        <script src="~/Script/bootstrap.min.js"></script>
+        <script src="~/Scripts/bootstrap.js"></script>
+    </head>
+
+    <body>
+        <nav class="nav navbar-default" role="navigation">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">PUCIT Social Club</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li><a href="/Home/Index">Home</a></li>
+                    <li class="active"><a href="/Home/Contact">Contact Us</a></li>
+                </ul>
+                @if (Session["login"] != null)
+                {
+                    <form class="form-inline navbar-form navbar-left pull-right" action="/Home/LogOut" method="post">
+                        <div class="form-group">
+                            <button type="submit" style="text-decoration-color:white" class="btn btn-warning">Log Out</button>
+                        </div>
+                    </form>
+                }
+                <form class="form-inline navbar-form navbar-left pull-right" action="/Home/Login" method="post">
+                    @if (Session["login"] != null)
+                    {
+                      
+                        Student u = (Student)Session["userlog"];
+                      
+                        <div class="form-group" >
+                            @if (Session["isAdmin"] != null)
+                            {
+                                <i>
+                                    <a href="/Admin/AdminLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                                </i>
+                            }
+                            else
+                            {
+                                <i>
+                                    <a href="/Student/UserLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                                </i>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <strong style="text-decoration-color:white">Username: </strong>
+                            <input type="text" name="name" required placeholder="Enter Uername" />
+                            <strong style="text-decoration-color:white"> Password:  </strong>
+                            <input type="password" name="passwd" required placeholder="Enter Password" />
+                            <button type="submit" style="text-decoration-color:white" class="btn btn-primary">Login</button>
+                        </div>
+                    }
+                </form>
+
+            </div>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-2 row">
+
+            </div>
+
+            <div class="col-md-8 row" style="background-color: #00CCFF;margin-top:80px">
+                <div class="form-group" id=" contact-info">
+                    <div class="form-group text text-center">
+                        <h2 class="form-group">Follow Us At ..!</h2>
+
+                        <p>
+                            <label>Facebook: </label><a href="#"> facebook link</a><br /><br />
+                            <label>Twitter: </label><a href="#"> twitter link</a>
+                        </p>
+                    </div>
+
+                    <div class="" id="contact-message">
+                        <div class="form-group text text-center" role="form">
+                            <div class="form-group text text-center" style="margin-top:80px">
+                                <h2>Drop Your Message..</h2>
+                                <p>We appreciate your feedback.</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="status alert alert-success" style="display: none"></div>
+                                <form action="/Admin/SaveMessage" method="post" class="">
+                                    <div class="col-sm-5 col-sm-offset-1">
+                                        <div class="form-group">
+                                            <label>Name *</label>
+                                            <input type="text" name="name" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Email *</label>
+                                            <input type="email" name="email" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Phone</label>
+                                            <input type="tel" name="phone" class="form-control" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Section</label>
+                                            <input type="text" name="section" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label>Subject *</label>
+                                            <input type="text" name="subject" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Message *</label>
+                                            <textarea id="message" name="message" rows="8" class="form-control" required></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <button type="submit" name="submit-button" class="btn btn-primary btn-lg pull-right">Submit Message</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-2 row">
+
+            </div>
+
+        </div>
+        
+
+        <footer class="modal-footer" style="margin-top:200px; padding-top:60px; background-color:lightgrey">Created By Afnan Ahmad</footer>
+    </body>
+
+</html>
+

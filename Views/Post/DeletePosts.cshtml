@@ -1,0 +1,169 @@
+﻿@model PUCITSocialClub.Models.Post
+@using PUCITSocialClub.Models
+
+@{
+    ViewBag.Title = "DeleteComment";
+    Layout = null;
+}
+
+<html>
+
+<head>
+    <title>@ViewBag.Title</title>
+
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/navbar-color.css" rel="stylesheet" />
+    <script src="~/Script/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</head>
+
+<body>
+    <nav class="nav navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">PUCIT Social Club</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/Contact">Contact Us</a></li>
+            </ul>
+
+            <form class="form-inline navbar-form navbar-left pull-right" action="/Home/Login" method="post">
+                @{
+                    Student u = (Student)Session["userlog"];
+                    SocialClubDbEntities1 de = new SocialClubDbEntities1 ();
+                    int msgs = 0;
+                }
+                <div class="form-group">
+                    @if (Session["isAdmin"] != null)
+                    {
+                        <i>
+                            <a href="/Admin/AdminLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                    else
+                    {
+                        <i>
+                            <a href="/Student/UserLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                </div>
+                <div class="form-group">
+                    <button type="submit" style="text-decoration-color:white" class="btn btn-warning">Log Out</button>
+                </div>
+            </form>
+
+        </div>
+    </nav>
+    <div class="row" style="padding-top:60px">
+        <div class="col-md-3">
+            <div class="list-group" style="min-height:750px; max-width:300px">
+                <label class="list-group-item active">Activities</label>
+                <a class="list-group-item" href="/Post/AddPost">Make a Post</a>
+                <a class="list-group-item" href="/Student/SearchStudent">Search for a Student</a>
+                <a class="list-group-item" href="/Group/CreateGroup">Create a Group</a>
+                <a class="list-group-item" href="/Group/ViewGroups">View Groups</a>
+                <a class="list-group-item active" href="/Group/ShowGroups">Visit Your Groups</a>
+                <a class="list-group-item" href="/Group/JoinGroup">Join a Group</a>
+                <a class="list-group-item" href="/Student/EditProfile">Edit your Profile</a>
+                @if (Session["isAdmin"] != null)
+                {
+                    <a class="list-group-item" href="/Admin/ViewUsers">View Users</a>
+                    {
+                        foreach (AdminMessage adm in de.AdminMessages.Where ( x => x.newmsg.Equals ( "yes" ) ))
+                        {
+                            msgs++;
+                        }
+                     }
+                    if (msgs <= 0)
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages">Public Messages</a>
+                    }
+                    else
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages"><span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Public Messages(@msgs)</a>
+                    }
+                }
+                @{
+                    int newmsg = 0;
+                    foreach (Message adm in de.Messages.Where ( x => x.sentto == u.Id && x.newmsg.Equals ( "yes" ) ))
+                    {
+                        newmsg++;
+                    }
+                }
+                @if (newmsg <= 0)
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">Inbox</a>
+                }
+                else
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">
+                        <span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Inbox(@newmsg)
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6 pull-left">
+            <div>
+                <div class="panel panel-info">
+                    <div class="panel panel-heading">
+                        <div class="text-primary"><h2>Remove Comments</h2></div>
+                    </div>
+
+                    <div class="panel panel-body">
+                        @{
+                            Boolean status = false;
+                        }
+
+                        @foreach (Post p in ViewBag.Posts)
+                        {
+                            <form action="/Post/RemovePost"
+                                          method="post" class="form-horizontal" role="form">
+
+                            @if (p.groupid == (int)ViewBag.gId)
+                            {
+                                <div class="form-group">
+                                    <label class="text-justify text-success">Post Content : </label>
+                                    <p class="form-control">
+                                        <strong><i> @p.postcontent </i></strong>
+                                    </p>
+                                    <input type="hidden" value="@p.Id" name="Id" />
+                                    <input type="hidden" value="@p.groupid" name="groupid" />
+                                    <input type="hidden" value="@p.postcontent" name="postcontent" />
+                                    <input type="hidden" value="@p.time" name="time" />
+                                    <input type="hidden" value="@p.creatorid" name="creatorid" />
+                                    <input type="submit" class="btn btn-danger"  value="Delete" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Comments</label>
+                                </div>
+                                foreach (Comment c in p.Comments)
+                                {
+                                    Student std = (Student)Session["userlog"];
+                                    status = true;
+
+                                    
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label"></label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" value="@c.content" name="content" />
+                                            </div>
+                                        </div>
+
+                                   
+                                }
+                            }
+                                </form>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <footer class="modal-footer" style="margin-top: 100px; padding-top: 60px; background-color: lightgrey">Created By Afnan Ahmad</footer>
+</body>
+
+</html>

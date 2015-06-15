@@ -1,0 +1,230 @@
+﻿@model PUCITSocialClub.Models.Student
+@using PUCITSocialClub.Models
+
+@{
+    ViewBag.Title = "EditProfile";
+    Layout = null;
+}
+
+<html>
+<head>
+    <title>EditProfile</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/navbar-color.css" rel="stylesheet" />
+    <script src="~/Script/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</head>
+
+<body>
+    <nav class="nav navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">PUCIT Social Club</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/Contact">Contact Us</a></li>
+            </ul>
+
+            <form class="form-inline navbar-form navbar-left pull-right" action="/Home/LogOut" method="post">
+                @{
+                    Student u = (Student)Session["userlog"];
+                    SocialClubDbEntities1 de = new SocialClubDbEntities1 ();
+                    int msgs = 0;
+                }
+                <div class="form-group">
+                    @if (Session["isAdmin"] != null)
+                    {
+                        <i>
+                            <a href="/Admin/AdminLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                    else
+                    {
+                        <i>
+                            <a href="/Student/UserLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                    
+                </div>
+                <div class="form-group">
+                    <button type="submit" style="text-decoration-color:white" class="btn btn-warning">Log Out</button>
+                </div>
+            </form>
+        </div>
+    </nav>
+
+    <div class="row" style="padding-top:60px">
+        <div class="col-md-3">
+            <div class="list-group" style="min-height:750px; max-width:300px">
+                <label class="list-group-item active">Activities</label>
+                <a class="list-group-item" href="/Home/SearchStudent">Search for a Student</a>
+                <a class="list-group-item" href="/Group/CreateGroup">Create a Group</a>
+                <a class="list-group-item" href="/Group/ViewGroups">View Groups</a>
+                <a class="list-group-item" href="/Group/ShowGroups">Visit Your Groups</a>
+                <a class="list-group-item" href="/Group/JoinGroup">Join a Group</a>
+                <a class="list-group-item active" href="/Student/EditClick">Edit your Profile</a>
+                @if (Session["isAdmin"] != null)
+                {
+                    <a class="list-group-item" href="/Admin/ViewUsers">View Users</a>
+                    {
+                        foreach (AdminMessage adm in de.AdminMessages.Where ( x => x.newmsg.Equals ( "yes" ) ))
+                        {
+                            msgs++;
+                        }
+                     }
+                    if (msgs <= 0)
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages">Public Messages</a>
+                    }
+                    else
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages"><span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Public Messages(@msgs)</a>
+                    }
+                }
+                @{
+                    int newmsg = 0;
+                    foreach (Message adm in de.Messages.Where ( x => x.sentto == u.Id && x.newmsg.Equals ( "yes" ) ))
+                    {
+                        newmsg++;
+                    }
+                }
+                @if (newmsg <= 0)
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">Inbox</a>
+                }
+                else
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">
+                        <span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Inbox(@newmsg)
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6 pull-left">
+            <section>
+                <div class="container">
+                    <div class="centre">
+                        <h2>Edit your Profile</h2>
+                    </div>
+
+                    <div class="col-md-6 pull-left">
+                        <div id="signupbox">
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">
+                                    <div class="panel-title">Edit your Profile</div>
+                                    
+                                </div>
+
+                                <div class="panel-body">
+                                    <form action="/Student/UpdateImage" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+                                        @if (Session["editcheck"] != null && Session["imgcheck"] == null)
+                                        {
+                                            <div class="row">
+                                                <div class="col-md-4 form-group pull-left" >
+                                                    <div >
+                                                        <img style="margin-left: 20px" src="~/Files/@Model.img" width="150" height="150" class="pull-right" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-md-5 pull-left">
+                                                    <label for="img" style="margin-left:10px" class="control-label">Upload Image: </label>
+                                                    <div class="col-md-7">
+                                                        <input type="file" required name="image" class=" btn btn-primary" />
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input type="submit" style="margin-top: 40px" value="Update" class="pull-right btn btn-primary" />
+                                                    </div>
+                                                </div>
+
+                                                
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            string str = (string)Session["imgN"];
+                                            int j =0;
+                                            <div class="form-group">
+                                                 <div>
+                                                     <img src="~/Files/@str"  width="200" height="200" class="" />
+                                                 </div>
+                                            </div>
+                                        }
+                                        
+                                    </form>
+
+                                    <form action="/Student/UpdateProfile" method="post" class="form-horizontal" role="form">
+                                        <div class="form-group">
+                                            <label for="username" class="col-md-3 control-label">Username</label>
+                                            <div class="col-md-9">
+                                                <input type="text" required class="form-control" value="@Model.username" name="username">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="password" class="col-md-3 control-label">Password</label>
+                                            <div class="col-md-9">
+                                                <input type="text" required class="form-control" value="@Model.password" name="password">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="fullname" class="col-md-3 control-label">Full Name</label>
+                                            <div class="col-md-9">
+                                                <input type="text" required class="form-control" value="@Model.fullname" name="fullname">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="email" class="col-md-3 control-label">Email</label>
+                                            <div class="col-md-9">
+                                                <input type="email" required class="form-control" value="@Model.email" name="email">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="address" class="col-md-3 control-label">Address</label>
+                                            <div class="col-md-9">
+                                                <input type="text" required class="form-control" value="@Model.address" name="address">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="contact" class="col-md-3 control-label">Contact</label>
+                                            <div class="col-md-9">
+                                                <input type="tel" class="form-control" value="@Model.contact" name="contact">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="rollnumber" class="col-md-3 control-label">Roll Number</label>
+                                            <div class="col-md-9">
+                                                <input type="text" class="form-control" value="@Model.rollnumber" name="rollnumber">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="currsemester" class="col-md-3 control-label">Current Semester</label>
+                                            <div class="col-md-9">
+                                                <input type="number" class="form-control" value="@Model.currsemester" name="currsemester">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="col-md-offset-3 col-md-9">
+                                                <button id="btn-signup" type="submit" class="btn btn-info pull-right">Edit</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+            </section>
+        </div>
+    </div>
+
+    <footer class="modal-footer" style="margin-top: 100px; padding-top: 60px; background-color: lightgrey">Created By Afnan Ahmad</footer>
+</body>
+</html>
+

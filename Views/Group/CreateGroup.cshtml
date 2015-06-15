@@ -1,0 +1,155 @@
+﻿@model PUCITSocialClub.Models.Group
+@using PUCITSocialClub.Models
+
+@{
+    
+    Layout = null;
+}
+
+<html>
+
+<head>
+    <title>CreateGroup</title>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/navbar-color.css" rel="stylesheet" />
+    <script src="~/Script/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+</head>
+
+<body>
+    <nav class="nav navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">PUCIT Social Club</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="/Home/Index">Home</a></li>
+                <li><a href="/Home/Contact">Contact Us</a></li>
+            </ul>
+
+            <form class="form-inline navbar-form navbar-left pull-right" action="/Home/LogOut" method="post">
+                @{
+                    Student u = (Student)Session["userlog"];
+                    SocialClubDbEntities1 de = new SocialClubDbEntities1 ();
+                    int msgs = 0;
+                }
+                <div class="form-group">
+                    @if (Session["isAdmin"] != null)
+                    {
+                        <i>
+                            <a href="/Admin/AdminLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                    else
+                    {
+                        <i>
+                            <a href="/Student/UserLogin" style="height:35px" class="btn btn-info text text-info">Welcome  @u.fullname </a>
+                        </i>
+                    }
+                </div>
+                <div class="form-group">
+                    <button type="submit" style="text-decoration-color:white" class="btn btn-warning">Log Out</button>
+                </div>
+            </form>
+
+        </div>
+    </nav>
+    <div class="row" style="padding-top:60px">
+        <div class="col-md-3">
+            <div class="list-group" style="min-height:750px; max-width:300px">
+                <label class="list-group-item active">Activities</label>
+                <a class="list-group-item" href="/Student/SearchStudent">Search for a Student</a>
+                <a class="list-group-item active" href="/Group/CreateGroup">Create a Group</a>
+                <a class="list-group-item" href="/Group/ViewGroups">View Groups</a>
+                <a class="list-group-item" href="/Group/ShowGroups">Visit Your Groups</a>
+                <a class="list-group-item" href="/Group/JoinGroup">Join a Group</a>
+                <a class="list-group-item" href="/Student/EditProfile">Edit your Profile</a>
+                @if (Session["isAdmin"] != null)
+                {
+                    <a class="list-group-item" href="/Admin/ViewUsers">View Users</a>
+                    {
+                        foreach (AdminMessage adm in de.AdminMessages.Where ( x => x.newmsg.Equals ( "yes" ) ))
+                        {
+                            msgs++;
+                        }
+                     }
+                    if (msgs <= 0)
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages">Public Messages</a>
+                    }
+                    else
+                    {
+                        <a class="list-group-item" href="/Admin/ViewMessages"><span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Public Messages(@msgs)</a>
+                    }
+                }
+                @{
+                    int newmsg = 0;
+                    foreach (Message adm in de.Messages.Where ( x => x.sentto == u.Id && x.newmsg.Equals ( "yes" ) ))
+                    {
+                        newmsg++;
+                    }
+                }
+                @if (newmsg <= 0)
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">Inbox</a>
+                }
+                else
+                {
+                    <a class="list-group-item" href="/Message/ViewInbox">
+                        <span style="margin-right:10px" class="glyphicon glyphicon-envelope"></span>Inbox(@newmsg)
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6 pull-left">
+            <div>
+                @if (Session["group_created"] != null)
+                {
+                    <div class="panel panel-success">
+                        <div class="panel panel-heading">
+                                <div class="text-center text-primary"><strong>**Congratulations**</strong></div>
+                        </div>
+
+                        <div class="panel panel-body">
+                            <div>
+                                <div class="text-success"><i>Group Successfully created :)</i></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="panel panel-danger">
+                    <div class="panel panel-heading">
+                        <div>
+                            <h2>Create a Group</h2>
+                            @if (Session["group_error"] != null)
+                            {
+                                <div class="text-center text-danger"><strong>Group Title Already Exists !!</strong></div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="panel panel-body">
+                        <form action="/Group/AddGroup" method="post">
+                            <div class="form-group">
+                                <label>Group Title : </label>
+                                <input type="text" placeholder="Enter a Title for Group" name="title" class="form-group form-control" />
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-success" value="Create" />
+                            </div>
+                        </form>
+                    </div>
+                    </div>
+                }
+                
+            </div>
+        </div>
+
+        </div>
+        <footer class="modal-footer" style="margin-top: 100px; padding-top: 60px; background-color: lightgrey">Created By Afnan Ahmad</footer>
+</body>
+
+</html>
